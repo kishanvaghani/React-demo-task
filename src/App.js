@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getRequest } from "./utils";
 import ReactPaginate from "react-paginate";
@@ -6,6 +6,7 @@ import ProductCard from "./components/productCard";
 
 function App() {
   const [query, setQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // Holds debounced query
   const [page, setPage] = useState(0);
   const [resultsPerPage, setResultsPerPage] = useState(10);
 
@@ -15,8 +16,8 @@ function App() {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["products", page, resultsPerPage, query],
-    queryFn: () => getData(page, resultsPerPage, query),
+    queryKey: ["products", page, resultsPerPage, searchTerm],
+    queryFn: () => getData(page, resultsPerPage, searchTerm),
     enabled: true,
   });
 
@@ -30,10 +31,19 @@ function App() {
     return res;
   }
 
-  const searchProducts = (e) => {
-    e.preventDefault();
-    refetch();
+  const handleSearchChange = (e) => {
+    setQuery(e.target.value);
   };
+
+  // Debounce effect: update searchTerm after a 500ms delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(query);
+      setPage(0); // Reset to the first page on new search
+    }, 500);
+
+    return () => clearTimeout(timer); // Clear timeout if query changes before delay ends
+  }, [query]);
 
   const totalProducts = productsData?.total || 0;
   const pageCount = Math.ceil(totalProducts / resultsPerPage);
@@ -49,11 +59,14 @@ function App() {
       <div className="container mx-auto">
         <h1 className="text-3xl font-bold text-center mb-6">Product Search</h1>
 
-        <form onSubmit={searchProducts} className="mb-6 flex justify-center">
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="mb-6 flex justify-center"
+        >
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={handleSearchChange}
             placeholder="Search products..."
             className="w-1/2 p-2 border rounded-md"
           />
@@ -76,6 +89,12 @@ function App() {
           <p className="text-center text-red-500">Error fetching products.</p>
         )}
 
+        {!isLoading && productsData?.products?.length === 0 && (
+          <p className="text-center text-gray-500 h-[50vh] flex items-center justify-center">
+            No products found.
+          </p>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {productsData?.products?.map((product) => (
             <ProductCard key={product.id} product={product} />
@@ -94,9 +113,9 @@ function App() {
           activeClassName="bg-blue-500 text-white rounded-md"
           containerClassName="flex"
           pageClassName="px-3 py-1 border rounded-md"
-          previousClassName="px-3 py-1 border rounded-md hover:bg-blue-500  hover:text-white"
-          nextClassName="px-3 py-1 border rounded-md hover:bg-blue-500  hover:text-white"
-          breakClassName="px-3 py-1 border hover:bg-blue-500  hover:text-white"
+          previousClassName="px-3 py-1 border rounded-md hover:bg-blue-500 hover:text-white"
+          nextClassName="px-3 py-1 border rounded-md hover:bg-blue-500 hover:text-white"
+          breakClassName="px-3 py-1 border hover:bg-blue-500 hover:text-white"
           disabledClassName="bg-gray-400 text-gray-500"
         />
       </div>
