@@ -35,14 +35,13 @@ function App() {
     setQuery(e.target.value);
   };
 
-  // Debounce effect: update searchTerm after a 500ms delay
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchTerm(query);
-      setPage(0); // Reset to the first page on new search
+      setPage(0);
     }, 500);
 
-    return () => clearTimeout(timer); // Clear timeout if query changes before delay ends
+    return () => clearTimeout(timer);
   }, [query]);
 
   const totalProducts = productsData?.total || 0;
