@@ -46,6 +46,7 @@ function App() {
 
   const totalProducts = productsData?.total || 0;
   const pageCount = Math.ceil(totalProducts / resultsPerPage);
+  const isMobile = window.innerWidth < 600;
 
   return (
     <div className="bg-gray-100 min-h-screen p-6 relative">
@@ -99,24 +100,26 @@ function App() {
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
-
-        <ReactPaginate
-          className="flex justify-center mt-6 space-x-2"
-          breakLabel="..."
-          nextLabel="Next >"
-          onPageChange={(selected) => setPage(selected.selected)}
-          pageRangeDisplayed={2}
-          pageCount={pageCount}
-          previousLabel="< Previous"
-          renderOnZeroPageCount={null}
-          activeClassName="bg-blue-500 text-white rounded-md"
-          containerClassName="flex"
-          pageClassName="px-3 py-1 border rounded-md"
-          previousClassName="px-3 py-1 border rounded-md hover:bg-blue-500 hover:text-white"
-          nextClassName="px-3 py-1 border rounded-md hover:bg-blue-500 hover:text-white"
-          breakClassName="px-3 py-1 border hover:bg-blue-500 hover:text-white"
-          disabledClassName="bg-gray-400 text-gray-500"
-        />
+        <div>
+          <ReactPaginate
+            className="flex justify-center mt-6 space-x-2"
+            breakLabel="..."
+            nextLabel="Next >"
+            onPageChange={(selected) => setPage(selected.selected)}
+            pageRangeDisplayed={isMobile ? 0 : 2}
+            pageCount={pageCount}
+            marginPagesDisplayed={isMobile ? 0 : 1}
+            previousLabel="< Prevoius"
+            renderOnZeroPageCount={null}
+            activeClassName="bg-blue-500 text-white rounded-md"
+            containerClassName="flex"
+            pageClassName="px-3 py-1 border rounded-md"
+            previousClassName="px-3 py-1 border rounded-md hover:bg-blue-500  hover:text-white"
+            nextClassName="px-3 py-1 border rounded-md hover:bg-blue-500  hover:text-white"
+            breakClassName="px-3 py-1 border hover:bg-blue-500  hover:text-white"
+            disabledClassName="bg-gray-400 text-gray-500"
+          />
+        </div>
       </div>
     </div>
   );
