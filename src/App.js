@@ -118,6 +118,7 @@ function App() {
             nextClassName="px-3 py-1 border rounded-md hover:bg-blue-500  hover:text-white"
             breakClassName="px-3 py-1 border hover:bg-blue-500  hover:text-white"
             disabledClassName="bg-gray-400 text-gray-500"
+            forcePage={page}
           />
         </div>
       </div>
